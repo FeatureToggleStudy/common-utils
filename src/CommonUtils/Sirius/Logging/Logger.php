@@ -44,8 +44,10 @@ class Logger extends ZendLogger
      */
     private function extractDataFromRequestResponse()
     {
-        return $this->extractor->process();
+        if(isset($this->extractor)) {
+            return $this->extractor->process();
+        } else {
+            return array('empty' => 'extractor not set');
+        }
     }
-
-
 }
