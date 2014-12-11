@@ -1,6 +1,12 @@
 {
     "name" : "ministryofjustice/common-utils",
     "description" : "Common code that is needed for all projects",
+    "keywords": [
+        "ministryofjustice",
+        "opg"
+    ],
+    "homepage": "https://github.com/ministryofjustice/common-utils",
+    "type": "library",
     "require": {
         "php": ">=5.4",
         "zendframework/zendframework": "2.*",
