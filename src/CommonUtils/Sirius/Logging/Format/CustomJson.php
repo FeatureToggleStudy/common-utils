@@ -7,23 +7,17 @@ use DateTime;
 
 class CustomJson implements FormatterInterface
 {
-    private $format = 'c';
-
     /**
      * Get the format specifier for DateTime objects
      * @return string
      */
-    public function getDateTimeFormat() {
-        return 'c';
-    }
+    public function getDateTimeFormat() {}
 
     /**
      * @param string $dateTimeFormat
      * @return void|FormatterInterface
      */
-    public function setDateTimeFormat($dateTimeFormat) {
-        $this->format = $dateTimeFormat;
-    }
+    public function setDateTimeFormat($dateTimeFormat) {}
 
     /**
      * @param array $event
