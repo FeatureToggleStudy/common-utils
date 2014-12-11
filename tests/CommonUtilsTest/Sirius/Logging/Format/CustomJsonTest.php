@@ -30,4 +30,11 @@ class CustomJsonTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($jsonResult, $result);
     }
+
+    public function testSetGetDateFormat()
+    {
+        $format= 'c';
+        $this->customjson->setDateTimeFormat($format);
+        $this->assertEquals($this->customjson->getDateTimeFormat(), $format);
+    }
 }
