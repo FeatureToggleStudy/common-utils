@@ -7,6 +7,7 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
 use Sirius\Logging\Logger;
 use Sirius\Logging\Extractor;
+use Zend\Log\Logger as ZendLogger;
 
 
 /**
@@ -30,11 +31,8 @@ class Module
 
         $logger = $event->getApplication()->getServiceManager()->get('Logger');
         $logger->setExtractor($extractor);
-        //$siriusLogger->setResponse();
 
-        //print_r(get_class_methods(get_class($event)));
-        //exit();
-        //A global exception handler that handles uncaught exceptions in code
+        //catches exceptions for stuff that is dispatched
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sm = $event->getApplication()->getServiceManager();
         $sharedManager->attach('Zend\Mvc\Application', 'dispatch.error',
@@ -44,6 +42,14 @@ class Module
             }
         });
 
+        //catch exceptions that are uncaught
+        set_exception_handler(function($exception) use ($sm, $extractor, $event) {
+                //ensure that the application log, logs a 500 error
+                $event->getResponse()->setStatusCode(500);
+                $extractor->setResponse($event->getResponse());
+                http_response_code(500);
+                $sm->get('Logger')->crit($exception);
+        });
         return;
     }
 
@@ -80,8 +86,6 @@ class Module
                     $config = $sm->get('Config')['CommonUtils\Logger'];
                     $logger = new Sirius\Logging\Logger();
 
-
-                    $writers = 0;
                     foreach ($config['writers'] as $writer) {
                         if ($writer['enabled']) {
                             $writerAdapter = new $writer['adapter']($writer['adapterOptions']['output']);
@@ -96,16 +100,10 @@ class Module
                                     $writer['filter']
                                 )
                             );
-
-                            $writers++;
                         }
                     }
 
-                    !$config['registerErrorHandler'] ? : ZendLogger::registerErrorHandler($logger);
-                    !$config['registerExceptionHandler'] ? : ZendLogger::registerExceptionHandler($logger);
-
-                    $writers > 0 ? : $logger->addWriter(new \Zend\Log\Writer\Null);
-
+                    ZendLogger::registerErrorHandler($logger);
                     return $logger;
                 },
                 'CommonUtils\Extractor' => function($sm) {
@@ -117,4 +115,6 @@ class Module
             )
         );
     }
+
+
 }
