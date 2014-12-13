@@ -32,7 +32,7 @@ class Module
         $logger = $event->getApplication()->getServiceManager()->get('Logger');
         $logger->setExtractor($extractor);
 
-        //catches exceptions for stuff that is dispatched
+        //catches exceptions for errors during dispatch
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sm = $event->getApplication()->getServiceManager();
         $sharedManager->attach('Zend\Mvc\Application', 'dispatch.error',
@@ -42,7 +42,7 @@ class Module
             }
         });
 
-        //catch exceptions that are uncaught
+        //catches exceptions in application code that are uncaught. For example if a database server goes down.
         set_exception_handler(function($exception) use ($sm, $extractor, $event) {
                 //ensure that the application log, logs a 500 error
                 $event->getResponse()->setStatusCode(500);
@@ -51,8 +51,8 @@ class Module
                 $sm->get('Logger')->crit($exception);
         });
 
-        //global catchall to log when a 400 or 500 error message is not thrown as an exception
-        //we log the response and status code correctly.
+        //global catchall to log when a 400 or 500 error message is set on a response.
+        //This is mainly for logging purposes.
         $eventManager->attach(MvcEvent::EVENT_FINISH,
             function ($e) use ($logger, $extractor) {
                 $statusCode = $e->getResponse()->getStatusCode();
