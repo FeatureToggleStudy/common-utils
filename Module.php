@@ -50,7 +50,27 @@ class Module
                 http_response_code(500);
                 $sm->get('Logger')->crit($exception);
         });
-        return;
+
+        //global catchall to log when a 400 or 500 error message is not thrown as an exception
+        //we log the response and status code correctly.
+        $eventManager->attach(MvcEvent::EVENT_FINISH,
+            function ($e) use ($logger, $extractor) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $sm = $e->getApplication()->getServiceManager();
+                if($statusCode >= 500) {
+                    $e->getResponse()->setStatusCode($statusCode);
+                    $extractor->setResponse($e->getResponse());
+                    $sm->get('Logger')->crit($e->getResponse());
+                }
+                if($statusCode >= 400 && $statusCode < 500) {
+                    $e->getResponse()->setStatusCode($statusCode);
+                    $extractor->setResponse($e->getResponse());
+                    $sm->get('Logger')->err($e->getResponse());
+                }
+
+            }
+        );
+
     }
 
     /**
