@@ -55,6 +55,9 @@ class Module
         //This is mainly for logging purposes.
         $eventManager->attach(MvcEvent::EVENT_FINISH,
             function ($e) use ($logger, $extractor) {
+                if(!method_exists($e->getResponse(),'getStatusCode')) {
+                    return;
+                }
                 $statusCode = $e->getResponse()->getStatusCode();
                 $sm = $e->getApplication()->getServiceManager();
                 if($statusCode >= 500) {
@@ -67,7 +70,6 @@ class Module
                     $extractor->setResponse($e->getResponse());
                     $sm->get('Logger')->err($e->getResponse());
                 }
-
             }
         );
 
