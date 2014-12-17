@@ -26,7 +26,7 @@ class CustomJsonTest extends \PHPUnit_Framework_TestCase
         $event['extra'] = array('status_code' => 200, 'request_method' => 'POST');
         $result = $this->customjson->format($event);
 
-        $jsonResult = sprintf('{"timestamp_msec":%s,"@fields":{"priority":7,"priorityName":"DEBUG","message":"Some logging test","status_code":200,"request_method":"POST"}}',$event['timestamp']->getTimestamp());
+        $jsonResult = sprintf('{"timestamp":%s,"@fields":{"priority":7,"priorityName":"DEBUG","message":"Some logging test","status_code":200,"request_method":"POST"}}',$event['timestamp']->getTimestamp());
 
         $this->assertEquals($jsonResult, $result);
     }
