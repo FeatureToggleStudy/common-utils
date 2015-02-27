@@ -2,7 +2,7 @@ common-utils
 ============
 
 A Zend Framework 2 module which currently does logging. The idea with this was to perhaps create a shared library that
- was needed across front-end,back-end,membrane. The requirements for the logger will built from this ticket in JIRA: https://opgtransform.atlassian.net/browse/SDV-309
+ was needed across front-end,back-end,membrane. The requirements for the logger will built from this ticket in JIRA: https://opgtransform.atlassian.net/browse/SDV-309. Any update to this library means that you need to run composer for all three repos to update the logging for it. 
  
  There is a sample configuration file for the logger contained [in this repo](https://github.com/ministryofjustice/common-utils/blob/master/config/sample.logger.global.php)
  logger.global.php needs to be in the repo where you want logging. An example is [here](https://github.com/ministryofjustice/opg-core-back-end/blob/master/config/autoload/logger.global.php) 
