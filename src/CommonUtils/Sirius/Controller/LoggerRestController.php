@@ -1,6 +1,6 @@
 <?php
 
-namespace CommonUtils\Controller;
+namespace CommonUtils\Sirius\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 

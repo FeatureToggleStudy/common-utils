@@ -9,8 +9,8 @@ return array(
                     'route'    => '/logging',
                     'verb'     => 'post',
                     'defaults' => array(
-                        '__NAMESPACE__' => 'CommonUtils\Controller',
-                        'controller'    => 'CommonUtils\Controller\LoggerRest',
+                        '__NAMESPACE__' => 'CommonUtils\Sirius\Controller',
+                        'controller'    => 'CommonUtils\Sirius\Controller\LoggerRest',
                         'action'        => 'index'
                     ),
                 ),
@@ -19,7 +19,7 @@ return array(
     ),
     'controllers'     => array(
         'invokables' => array(
-            'CommonUtils/Controller/LoggerRest' => 'CommonUtils/Controller/LoggerRestController'
+            'CommonUtils\Sirius\Controller\LoggerRest' => 'CommonUtils\Sirius\Controller\LoggerRestController'
         ),
     ),
 );
