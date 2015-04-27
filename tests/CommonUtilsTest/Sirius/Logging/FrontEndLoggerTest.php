@@ -14,7 +14,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
     {
         $this->mockLogger = $this->getMockBuilder('CommonUtils\Sirius\Logging\Logger')
             ->disableOriginalConstructor()
-            ->setMethods(array('debug', 'info', 'warn', 'err', 'crit'))
+            ->setMethods(array('debug', 'info', 'warn', 'err', 'crit', '__destruct'))
             ->getMock();
     }
 
