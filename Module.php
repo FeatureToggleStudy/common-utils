@@ -128,12 +128,14 @@ class Module
                     ZendLogger::registerErrorHandler($logger);
                     return $logger;
                 },
-                'CommonUtils\Extractor' => function($sm) {
+                'CommonUtils\SiriusFrontEndLogger' => function ($sm) {
+                    return new Sirius\Logging\FrontEndLogger($sm->get('CommonUtils\SiriusLogger'));
+                },
+                'CommonUtils\Extractor' => function ($sm) {
                     $config = $sm->get('Config')['CommonUtils\Logger']['extractions'];
                     $extractor = new Sirius\Logging\Extractor($config);
                     return $extractor;
-                 }
-
+                }
             )
         );
     }
