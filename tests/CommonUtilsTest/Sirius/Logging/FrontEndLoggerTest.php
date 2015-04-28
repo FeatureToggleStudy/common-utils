@@ -28,7 +28,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
         if ($method) {
             $this->mockLogger->expects($this->once())
                 ->method($method)
-                ->with($json['message']['content']['message'], $json);
+                ->with($json['message'], $json);
         } else {
             $this->mockLogger->expects($this->never())
                 ->method('log');
@@ -46,11 +46,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'error',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_ALL,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test all message'
-                        ),
-                    ),
+                    'message' => 'test all message'
                 ),
             ),
             array(
@@ -58,11 +54,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'error',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_LOG,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test log message'
-                        ),
-                    ),
+                    'message' => 'test log message'
                 ),
             ),
             array(
@@ -70,11 +62,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'error',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_DEBUG,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test debug message'
-                        ),
-                    ),
+                    'message' => 'test debug message'
                 ),
             ),
             array(
@@ -82,11 +70,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'error',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_INFO,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test info message'
-                        ),
-                    ),
+                    'message' => 'test info message'
                 ),
             ),
             array(
@@ -94,11 +78,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'warn',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_WARN,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test warn message'
-                        ),
-                    ),
+                    'message' => 'test warn message'
                 ),
             ),
             array(
@@ -106,11 +86,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'error',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_ERROR,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test error message'
-                        ),
-                    ),
+                    'message' => 'test error message'
                 ),
             ),
             array(
@@ -118,11 +94,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'exception',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_ERROR,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test error exception message'
-                        ),
-                    ),
+                    'message' => 'test error exception message'
                 ),
             ),
             array(
@@ -130,11 +102,7 @@ class FrontEndLoggerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'type' => 'exception',
                     'priority' => FrontEndLogger::FRONT_LOG_LEVEL_OFF,
-                    'message' => array(
-                        'content' => array(
-                            'message' => 'test log level off message'
-                        ),
-                    ),
+                    'message' => 'test log level off message'
                 ),
             ),
         );
