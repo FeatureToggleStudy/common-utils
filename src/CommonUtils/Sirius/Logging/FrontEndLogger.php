@@ -27,26 +27,24 @@ class FrontEndLogger
     {
         $json = json_decode($jsonString, true);
 
-        $message = $json['message']['content']['message'];
-
         switch ($json['priority']) {
             case self::FRONT_LOG_LEVEL_ALL:
             case self::FRONT_LOG_LEVEL_LOG:
             case self::FRONT_LOG_LEVEL_DEBUG:
-                $this->logger->debug($message, $json);
+                $this->logger->debug($json['message'], $json);
                 break;
             default:
             case self::FRONT_LOG_LEVEL_INFO:
-                $this->logger->info($message, $json);
+                $this->logger->info($json['message'], $json);
                 break;
             case self::FRONT_LOG_LEVEL_WARN:
-                $this->logger->warn($message, $json);
+                $this->logger->warn($json['message'], $json);
                 break;
             case self::FRONT_LOG_LEVEL_ERROR:
                 if ($json['type'] != 'exception') {
-                    $this->logger->err($message, $json);
+                    $this->logger->err($json['message'], $json);
                 } else {
-                    $this->logger->crit($message, $json);
+                    $this->logger->crit($json['message'], $json);
                 }
                 break;
             case self::FRONT_LOG_LEVEL_OFF:

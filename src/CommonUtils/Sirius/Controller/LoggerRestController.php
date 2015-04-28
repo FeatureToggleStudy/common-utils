@@ -8,7 +8,7 @@ class LoggerRestController extends AbstractActionController
 {
     public function indexAction()
     {
-        $this->getServiceLocator()->get('SiriusFrontEndLogger')->log($this->getRequest()->getContent());
+        $this->getServiceLocator()->get('CommonUtils\SiriusFrontEndLogger')->log($this->getRequest()->getContent());
         return $this->getResponse();
     }
 }
