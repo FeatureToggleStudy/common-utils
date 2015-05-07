@@ -35,12 +35,21 @@ class Module
         //catches exceptions for errors during dispatch
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sm = $event->getApplication()->getServiceManager();
-        $sharedManager->attach('Zend\Mvc\Application', 'dispatch.error',
-            function($event) use ($sm) {
-            if ($event->getParam('exception')){
-                $sm->get('Logger')->crit($event->getParam('exception'));
+        $sharedManager->attach(
+            'Zend\Mvc\Application',
+            'dispatch.error',
+            function ($event) use ($sm) {
+                if ($event->getParam('exception')) {
+                    $sm->get('Logger')->crit(
+                        $event->getParam('exception'),
+                        array(
+                            'category' => 'Dispatch',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
+                }
             }
-        });
+        );
 
         //catches exceptions in application code that are uncaught. For example if a database server goes down.
         set_exception_handler(function($exception) use ($sm, $extractor, $event) {
@@ -48,27 +57,46 @@ class Module
                 $event->getResponse()->setStatusCode(500);
                 $extractor->setResponse($event->getResponse());
                 http_response_code(500);
-                $sm->get('Logger')->crit($exception);
+                $sm->get('Logger')->crit(
+                    'Exception: [' . $exception->getMessage() . ']',
+                    array(
+                        'category' => 'API',
+                        'stackTrace' => $exception->getTrace(),
+                    )
+                );
         });
 
         //global catchall to log when a 400 or 500 error message is set on a response.
         //This is mainly for logging purposes.
-        $eventManager->attach(MvcEvent::EVENT_FINISH,
+        $eventManager->attach(
+            MvcEvent::EVENT_FINISH,
             function ($e) use ($logger, $extractor) {
-                if(!method_exists($e->getResponse(),'getStatusCode')) {
+                if (!method_exists($e->getResponse(), 'getStatusCode')) {
                     return;
                 }
                 $statusCode = $e->getResponse()->getStatusCode();
                 $sm = $e->getApplication()->getServiceManager();
-                if($statusCode >= 500) {
+                if ($statusCode >= 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->crit($e->getResponse());
+                    $sm->get('Logger')->crit(
+                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
+                        array(
+                            'category' => 'Event',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
                 }
-                if($statusCode >= 400 && $statusCode < 500) {
+                if ($statusCode >= 400 && $statusCode < 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->err($e->getResponse());
+                    $sm->get('Logger')->warn(
+                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
+                        array(
+                            'category' => 'Event',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
                 }
             }
         );
