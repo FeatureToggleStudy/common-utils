@@ -35,12 +35,21 @@ class Module
         //catches exceptions for errors during dispatch
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sm = $event->getApplication()->getServiceManager();
-        $sharedManager->attach('Zend\Mvc\Application', 'dispatch.error',
-            function($event) use ($sm) {
-            if ($event->getParam('exception')){
-                $sm->get('Logger')->crit($event->getParam('exception'));
+        $sharedManager->attach(
+            'Zend\Mvc\Application',
+            'dispatch.error',
+            function ($event) use ($sm) {
+                if ($event->getParam('exception')) {
+                    $sm->get('Logger')->crit(
+                        $event->getParam('exception'),
+                        array(
+                            'category' => 'Dispatch',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
+                }
             }
-        });
+        );
 
         //catches exceptions in application code that are uncaught. For example if a database server goes down.
         set_exception_handler(function($exception) use ($sm, $extractor, $event) {
@@ -48,7 +57,13 @@ class Module
                 $event->getResponse()->setStatusCode(500);
                 $extractor->setResponse($event->getResponse());
                 http_response_code(500);
-                $sm->get('Logger')->crit($exception);
+                $sm->get('Logger')->crit(
+                    'Uncaught Exception: [' . $exception->getMessage() . ']',
+                    array(
+                        'category' => 'Uncaught',
+                        'stackTrace' => $exception->getTrace(),
+                    )
+                );
         });
 
         //global catchall to log when a 400 or 500 error message is set on a response.
@@ -63,12 +78,24 @@ class Module
                 if($statusCode >= 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->crit($e->getResponse());
+                    $sm->get('Logger')->crit(
+                        'Uncaught Error 500 Exception: [' . $e->getResponse() . ']',
+                        array(
+                            'category' => 'Uncaught',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
                 }
                 if($statusCode >= 400 && $statusCode < 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->err($e->getResponse());
+                    $sm->get('Logger')->error(
+                        'Uncaught Error: [' . $e->getResponse() . ']',
+                        array(
+                            'category' => 'Uncaught',
+                            'stackTrace' => debug_backtrace(),
+                        )
+                    );
                 }
             }
         );
