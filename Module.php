@@ -58,9 +58,9 @@ class Module
                 $extractor->setResponse($event->getResponse());
                 http_response_code(500);
                 $sm->get('Logger')->crit(
-                    'Uncaught Exception: [' . $exception->getMessage() . ']',
+                    'Exception: [' . $exception->getMessage() . ']',
                     array(
-                        'category' => 'Uncaught',
+                        'category' => 'API',
                         'stackTrace' => $exception->getTrace(),
                     )
                 );
@@ -68,31 +68,32 @@ class Module
 
         //global catchall to log when a 400 or 500 error message is set on a response.
         //This is mainly for logging purposes.
-        $eventManager->attach(MvcEvent::EVENT_FINISH,
+        $eventManager->attach(
+            MvcEvent::EVENT_FINISH,
             function ($e) use ($logger, $extractor) {
-                if(!method_exists($e->getResponse(),'getStatusCode')) {
+                if (!method_exists($e->getResponse(), 'getStatusCode')) {
                     return;
                 }
                 $statusCode = $e->getResponse()->getStatusCode();
                 $sm = $e->getApplication()->getServiceManager();
-                if($statusCode >= 500) {
+                if ($statusCode >= 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
                     $sm->get('Logger')->crit(
-                        'Uncaught Error 500 Exception: [' . $e->getResponse() . ']',
+                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
                         array(
-                            'category' => 'Uncaught',
+                            'category' => 'Event',
                             'stackTrace' => debug_backtrace(),
                         )
                     );
                 }
-                if($statusCode >= 400 && $statusCode < 500) {
+                if ($statusCode >= 400 && $statusCode < 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->error(
-                        'Uncaught Error: [' . $e->getResponse() . ']',
+                    $sm->get('Logger')->warn(
+                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
                         array(
-                            'category' => 'Uncaught',
+                            'category' => 'Event',
                             'stackTrace' => debug_backtrace(),
                         )
                     );
