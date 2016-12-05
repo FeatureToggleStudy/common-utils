@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ruleset name="DVSA-V2">
+<ruleset name="OPG-V1">
   <rule ref="rulesets/design.xml/CouplingBetweenObjects">
     <priority>3</priority>
   </rule>
