@@ -20,18 +20,30 @@ class OpgHttpClientFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         /** @var Logger $logger */
+
         $logger = $serviceLocator->get('CommonUtils\SiriusLogger');
         $config = $serviceLocator->get('Config');
 
-        // Generate new request
         $restRequest = $this->generateRequest($serviceLocator);
 
         // Set up client with new adapter and request to backend
-        $client = new SiriusHttpClient();
+        $client = new SiriusHttpClient($config['opg-backend']['uri'], $config['opg-backend']['options']);
         $client->setLogger($logger)
             ->resetParameters()
             ->setAdapter($config['opg-backend']['adapter'])
             ->setRequest($restRequest);
+
+        if (array_key_exists(CURLOPT_SSL_VERIFYPEER, $config['curlopts'])) {
+            $client->getAdapter()->setCurlOption(CURLOPT_SSL_VERIFYPEER, $config['curlopts'][CURLOPT_SSL_VERIFYPEER]);
+        }
+
+        if (array_key_exists(CURLOPT_SSL_VERIFYHOST, $config['curlopts'])) {
+            $client->getAdapter()->setCurlOption(CURLOPT_SSL_VERIFYHOST, $config['curlopts'][CURLOPT_SSL_VERIFYHOST]);
+        }
+
+        if (array_key_exists(CURLOPT_CAINFO, $config['curlopts'])) {
+            $client->getAdapter()->setCurlOption(CURLOPT_CAINFO, $config['curlopts'][CURLOPT_CAINFO]);
+        }
 
         $client = $this->setupClientAuth($client, $config);
 
@@ -66,7 +78,7 @@ class OpgHttpClientFactory implements FactoryInterface
         $httpRequest = $serviceLocator->get('Request');
         $httpHeaders = $httpRequest->getHeaders();
 
-        $config      = $serviceLocator->get('Config');
+        $config = $serviceLocator->get('Config');
 
         $restRequest = new ZendHttpRequest();
         $restRequest->setUri($config['opg-backend']['uri']);
