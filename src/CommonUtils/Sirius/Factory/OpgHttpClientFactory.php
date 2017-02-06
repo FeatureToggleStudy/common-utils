@@ -24,14 +24,17 @@ class OpgHttpClientFactory implements FactoryInterface
         $logger = $serviceLocator->get('CommonUtils\SiriusLogger');
         $config = $serviceLocator->get('Config');
 
-        $restRequest = $this->generateRequest($serviceLocator);
+        $request = $this->generateRequest($serviceLocator);
 
         // Set up client with new adapter and request to backend
-        $client = new SiriusHttpClient($config['opg-backend']['uri'], $config['opg-backend']['options']);
+        $client = new SiriusHttpClient($config['sirius_http_client']['uri'], $config['sirius_http_client']['options']);
         $client->setLogger($logger)
             ->resetParameters()
-            ->setAdapter($config['opg-backend']['adapter'])
-            ->setRequest($restRequest);
+            ->setAdapter($config['sirius_http_client']['adapter']);
+
+        if (!empty($request)) {
+            $client->setRequest($request);
+        }
 
         if (array_key_exists(CURLOPT_SSL_VERIFYPEER, $config['curlopts'])) {
             $client->getAdapter()->setCurlOption(CURLOPT_SSL_VERIFYPEER, $config['curlopts'][CURLOPT_SSL_VERIFYPEER]);
@@ -59,8 +62,8 @@ class OpgHttpClientFactory implements FactoryInterface
      */
     private function setupClientAuth(SiriusHttpClient $client, $config)
     {
-        if (!empty($config['opg-backend']['username']) && !empty($config['opg-backend']['password'])) {
-            $client->setAuth($config['opg-backend']['username'], $config['opg-backend']['password']);
+        if (!empty($config['sirius_http_client']['username']) && !empty($config['sirius_http_client']['password'])) {
+            $client->setAuth($config['sirius_http_client']['username'], $config['sirius_http_client']['password']);
         }
 
         return $client;
@@ -76,29 +79,35 @@ class OpgHttpClientFactory implements FactoryInterface
     {
         /** @var ZendHttpRequest $httpRequest */
         $httpRequest = $serviceLocator->get('Request');
-        $httpHeaders = $httpRequest->getHeaders();
 
-        $config = $serviceLocator->get('Config');
+        if ($httpRequest instanceof ZendHttpRequest) {
+            $httpHeaders = $httpRequest->getHeaders();
 
-        $restRequest = new ZendHttpRequest();
-        $restRequest->setUri($config['opg-backend']['uri']);
-        $restHeaders = $restRequest->getHeaders();
+            $config = $serviceLocator->get('Config');
 
-        if ($httpHeaders->get('X-REQUEST-ID')) {
-            $restHeaders->addHeaderLine(
-                'X-REQUEST-ID',
-                $httpHeaders->get('X-REQUEST-ID')->getFieldValue()
-            );
+            $restRequest = new ZendHttpRequest();
+            $restRequest->setUri($config['sirius_http_client']['uri']);
+            $restHeaders = $restRequest->getHeaders();
+
+            if ($httpHeaders->get('X-REQUEST-ID')) {
+                $restHeaders->addHeaderLine(
+                    'X-REQUEST-ID',
+                    $httpHeaders->get('X-REQUEST-ID')->getFieldValue()
+                );
+            }
+
+            if ($serviceLocator->get('AuthenticationService')->hasIdentity()) {
+                $restHeaders->addHeaderLine(
+                    'http-secure-token',
+                    $serviceLocator->get('AuthenticationService')->getIdentity()->getToken()
+                );
+            }
+            $restRequest->setHeaders($restHeaders);
+
+            return $restRequest;
         }
 
-        if ($serviceLocator->get('AuthenticationService')->hasIdentity()) {
-            $restHeaders->addHeaderLine(
-                'http-secure-token',
-                $serviceLocator->get('AuthenticationService')->getIdentity()->getToken()
-            );
-        }
-        $restRequest->setHeaders($restHeaders);
-
-        return $restRequest;
+        // Zend\Console\Requests
+        return new ZendHttpRequest();
     }
 }
