@@ -23,29 +23,20 @@ class OpgHttpClientFactory implements FactoryInterface
 
         $logger = $serviceLocator->get('CommonUtils\SiriusLogger');
         $config = $serviceLocator->get('Config');
+        $uri = isset($config['sirius_http_client']['uri'])? $config['sirius_http_client']['uri'] : null;
+        $options = isset($config['sirius_http_client']['options'])? $config['sirius_http_client']['options'] : [];
 
         $request = $this->generateRequest($serviceLocator);
 
         // Set up client with new adapter and request to backend
-        $client = new SiriusHttpClient($config['sirius_http_client']['uri'], $config['sirius_http_client']['options']);
-        $client->setLogger($logger)
-            ->resetParameters()
-            ->setAdapter($config['sirius_http_client']['adapter']);
+        $client = new SiriusHttpClient(
+            $uri,
+            $options,
+            $logger
+        );
 
         if (!empty($request)) {
             $client->setRequest($request);
-        }
-
-        if (array_key_exists(CURLOPT_SSL_VERIFYPEER, $config['curlopts'])) {
-            $client->getAdapter()->setCurlOption(CURLOPT_SSL_VERIFYPEER, $config['curlopts'][CURLOPT_SSL_VERIFYPEER]);
-        }
-
-        if (array_key_exists(CURLOPT_SSL_VERIFYHOST, $config['curlopts'])) {
-            $client->getAdapter()->setCurlOption(CURLOPT_SSL_VERIFYHOST, $config['curlopts'][CURLOPT_SSL_VERIFYHOST]);
-        }
-
-        if (array_key_exists(CURLOPT_CAINFO, $config['curlopts'])) {
-            $client->getAdapter()->setCurlOption(CURLOPT_CAINFO, $config['curlopts'][CURLOPT_CAINFO]);
         }
 
         $client = $this->setupClientAuth($client, $config);
@@ -93,13 +84,6 @@ class OpgHttpClientFactory implements FactoryInterface
                 $restHeaders->addHeaderLine(
                     'X-REQUEST-ID',
                     $httpHeaders->get('X-REQUEST-ID')->getFieldValue()
-                );
-            }
-
-            if ($serviceLocator->get('AuthenticationService')->hasIdentity()) {
-                $restHeaders->addHeaderLine(
-                    'http-secure-token',
-                    $serviceLocator->get('AuthenticationService')->getIdentity()->getToken()
                 );
             }
             $restRequest->setHeaders($restHeaders);

@@ -16,10 +16,12 @@ class SiriusHttpClient extends ZendHttpClient
      *
      * @param string $uri
      * @param array|Traversable $options
+     * @param null $logger
      */
-    public function __construct($uri = null, $options = null)
+    public function __construct($uri = null, $options = null, $logger = null)
     {
         parent::__construct($uri, $options);
+        $this->logger = $logger;
     }
 
     /**

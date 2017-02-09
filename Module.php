@@ -3,6 +3,7 @@
 namespace CommonUtils;
 
 use CommonUtils\Sirius\Factory\OpgHttpClientFactory;
+use CommonUtils\Sirius\Http\Client\SiriusHttpClient;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
@@ -164,7 +165,8 @@ class Module
                     $config = $sm->get('Config')['CommonUtils\Logger']['extractions'];
                     $extractor = new Sirius\Logging\Extractor($config);
                     return $extractor;
-                }
+                },
+                SiriusHttpClient::class => OpgHttpClientFactory::class
             )
         );
     }
