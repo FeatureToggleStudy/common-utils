@@ -41,11 +41,12 @@ class Module
             'dispatch.error',
             function ($event) use ($sm) {
                 if ($event->getParam('exception')) {
+                    $exception = $event->getParam('exception');
                     $sm->get('Logger')->crit(
-                        $event->getParam('exception'),
+                        'Exception: [' . $exception->getMessage() . ']',
                         array(
                             'category' => 'Dispatch',
-                            'stackTrace' => debug_backtrace(),
+                            'stackTrace' => $exception->getTraceAsString(),
                         )
                     );
                 }
