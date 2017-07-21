@@ -10,7 +10,7 @@ use Zend\Http\Request;
 class SiriusHttpClient extends ZendHttpClient
 {
     const REQUEST_LOG_MESSAGE = 'Making HTTP request: %s %s';
-    const RESPONSE_LOG_MESSAGE = '%s Response received: %s %s (%s bytes)';
+    const RESPONSE_LOG_MESSAGE = '%s Response received: %s %s (%d bytes)';
     /** @var Logger $logger */
     private $logger;
 
@@ -56,7 +56,7 @@ class SiriusHttpClient extends ZendHttpClient
 
         $response = parent::send($request);
 
-        $contentType = 'content-type/unknown';
+        $contentType = 'Content-Type: application/octet-stream';
         if ($response->getHeaders()->has('Content-Type')) {
             $contentType = $response->getHeaders()->get('Content-Type')->toString();
         }
