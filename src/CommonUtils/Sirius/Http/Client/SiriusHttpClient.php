@@ -58,19 +58,36 @@ class SiriusHttpClient extends ZendHttpClient
 
         $contentType = 'content-type/unknown';
         if ($response->getHeaders()->has('Content-Type')) {
-            $contentType = $response->getHeaders()->get('Content-Type');
+            $contentType = $response->getHeaders()->get('Content-Type')->toString();
         }
 
-        $this->logger->info(
-            sprintf(
-                self::RESPONSE_LOG_MESSAGE,
-                $contentType,
-                $response->getStatusCode(),
-                $response->getReasonPhrase(),
-                strlen($response->getContent())
-            ),
-            ['category' => 'HTTP_CLIENT', 'sub_request_time' => microtime(true) - $preRequest]
-        );
+        if ((int) $response->getStatusCode() >= 500) {
+            $this->logger->warn(
+                sprintf(
+                    self::RESPONSE_LOG_MESSAGE,
+                    $contentType,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    strlen($response->getContent())
+                ),
+                [
+                    'category' => 'HTTP_CLIENT',
+                    'sub_request_time' => microtime(true) - $preRequest,
+                    'response' => $response->getBody()
+                ]
+            );
+        } else {
+            $this->logger->info(
+                sprintf(
+                    self::RESPONSE_LOG_MESSAGE,
+                    $contentType,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    strlen($response->getContent())
+                ),
+                ['category' => 'HTTP_CLIENT', 'sub_request_time' => microtime(true) - $preRequest]
+            );
+        }
 
         return $response;
     }
