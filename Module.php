@@ -62,7 +62,7 @@ class Module
                     'Exception: [' . $exception->getMessage() . ']',
                     array(
                         'category' => 'API',
-                        'stackTrace' => $exception->getTrace(),
+                        'stackTrace' => $exception->getTraceAsString(),
                     )
                 );
         });
@@ -84,7 +84,6 @@ class Module
                         'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
                         array(
                             'category' => 'Event',
-                            'stackTrace' => debug_backtrace(),
                         )
                     );
                 }
@@ -95,7 +94,6 @@ class Module
                         'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
                         array(
                             'category' => 'Event',
-                            'stackTrace' => debug_backtrace(),
                         )
                     );
                 }
