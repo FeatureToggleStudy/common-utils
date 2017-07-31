@@ -1,6 +1,24 @@
 <?php
 
+use CommonUtils\Sirius\Controller\CacheWarmerController;
+use CommonUtils\Sirius\Controller\Factory\CacheWarmerControllerFactory;
+
 return array(
+    'console' => [
+        'router' => [
+            'routes' => [
+                'moj/common-utils/sirius/cache-warmup' => [
+                    'options' => [
+                        'route' => 'sirius cache:warmup',
+                        'defaults' => [
+                            'controller' => CacheWarmerController::class,
+                            'action' => 'index',
+                        ],
+                    ],
+                ]
+            ],
+        ],
+    ],
     'router' => array(
         'routes' => array(
             'log' => array(
@@ -19,7 +37,10 @@ return array(
     ),
     'controllers'     => array(
         'invokables' => array(
-            'CommonUtils\Sirius\Controller\LoggerRest' => 'CommonUtils\Sirius\Controller\LoggerRestController'
+            'CommonUtils\Sirius\Controller\LoggerRest' => 'CommonUtils\Sirius\Controller\LoggerRestController',
         ),
+        'factories' => [
+            CacheWarmerController::class => CacheWarmerControllerFactory::class,
+        ],
     ),
 );
