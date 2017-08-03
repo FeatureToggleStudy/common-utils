@@ -25,22 +25,12 @@ class CustomJson implements FormatterInterface
      */
     public function format($event)
     {
-        $formattedLogLine = array('timestamp' => '','@fields' => array());
+        $log = $event;
+        unset($log['extra']);
+        $log = array_merge($log, $event['extra']);
+        $log['timestamp'] = $this->extractDateAsTimestamp($event['timestamp']);
 
-        foreach($event as $eventKey => $eventItem) {
-            if(is_string($eventItem) || is_int($eventItem)) {
-                $formattedLogLine['@fields'][$eventKey] = $eventItem;
-            } else if(is_object($eventItem)) {
-                if($eventItem instanceof DateTime) {
-                    $formattedLogLine['timestamp'] = $this->extractDateAsTimestamp($eventItem);
-                }
-            } else if(is_array($eventItem)) {
-                foreach($eventItem as $fieldKey => $fieldName) {
-                    $formattedLogLine['@fields'][$fieldKey] = $fieldName;
-                }
-            }
-        }
-        return json_encode($formattedLogLine);
+        return json_encode($log);
     }
 
     /**
