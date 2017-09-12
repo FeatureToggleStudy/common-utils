@@ -4,6 +4,7 @@ namespace CommonUtils;
 
 use CommonUtils\Sirius\Factory\OpgHttpClientFactory;
 use CommonUtils\Sirius\Http\Client\SiriusHttpClient;
+use CommonUtils\Sirius\Logging\Factory\PsrLoggerAdapterFactory;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
@@ -165,7 +166,8 @@ class Module
                     $extractor = new Sirius\Logging\Extractor($config);
                     return $extractor;
                 },
-                SiriusHttpClient::class => OpgHttpClientFactory::class
+                SiriusHttpClient::class => OpgHttpClientFactory::class,
+                'PsrLogger' => PsrLoggerAdapterFactory::class,
             )
         );
     }

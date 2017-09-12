@@ -17,5 +17,6 @@
     <php>
         <server name="SERVER_NAME" value="phpunit"/>
         <server name="APPLICATION_ENV" value="development"/>
+        <ini name="date.timezone" value="UTC"/>
     </php>
 </phpunit>
