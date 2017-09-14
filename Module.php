@@ -62,7 +62,7 @@ class Module
         //This is mainly for logging purposes.
         $eventManager->attach(
             MvcEvent::EVENT_FINISH,
-            function ($e) use ($logger, $extractor, $serviceManager) {
+            function ($e) use ($logger, $extractor) {
                 if (!method_exists($e->getResponse(), 'getStatusCode')) {
                     return;
                 }
@@ -70,22 +70,11 @@ class Module
                 if ($statusCode >= 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $serviceManager->get('Logger')->crit(
-                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
-                        array(
-                            'category' => 'Event',
-                        )
-                    );
-                }
-                if ($statusCode >= 400 && $statusCode < 500) {
+                    $logger->crit('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
+                } elseif ($statusCode >= 400 && $statusCode < 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $serviceManager->get('Logger')->warn(
-                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
-                        array(
-                            'category' => 'Event',
-                        )
-                    );
+                    $logger->warn('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
                 }
             }
         );
