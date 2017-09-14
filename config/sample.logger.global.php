@@ -1,7 +1,11 @@
 <?php
 return array(
     'CommonUtils\Logger' => array(
-
+        // Whether to output exceptions in the response using formatted HTML. Exceptions are always logged.
+        'displayExceptions' => false,
+        // Logs local variables. Should be disabled for environments containing real user data (Pre-Prod, Prod) as it
+        // may leak sensitive information.
+        'logLocalVariables' => false,
         // will add the $logger object before the current PHP error handler
         'registerErrorHandler' => false, // errors logged to your writers
         'registerExceptionHandler' => false, // exceptions logged to your writers
