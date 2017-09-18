@@ -10,11 +10,6 @@ use Symfony\Component\Debug\ExceptionHandler;
 final class ErrorHandling
 {
     /**
-     * @var bool
-     */
-    private static $enabled = false;
-
-    /**
      * @param LoggerInterface $psrLogger
      * @param array $config
      */
