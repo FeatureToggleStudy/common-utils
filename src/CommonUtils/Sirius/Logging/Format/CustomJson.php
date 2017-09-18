@@ -41,5 +41,4 @@ class CustomJson implements FormatterInterface
     {
         return $dateTime->getTimestamp();
     }
-
 }

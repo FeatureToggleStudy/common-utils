@@ -4,46 +4,50 @@ namespace CommonUtils;
 
 use CommonUtils\Sirius\Factory\OpgHttpClientFactory;
 use CommonUtils\Sirius\Http\Client\SiriusHttpClient;
+use CommonUtils\Sirius\Logging\ErrorHandling;
 use CommonUtils\Sirius\Logging\Factory\PsrLoggerAdapterFactory;
+use CommonUtils\Sirius\Logging\PsrLoggerAdapter;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
-use Sirius\Logging\Logger;
-use Sirius\Logging\Extractor;
-use Zend\Log\Logger as ZendLogger;
 
 /**
- * Class Module
- * @package DateUtils
+ * Class Module.
  */
 class Module
 {
     /**
-     * @param MvcEvent $e
+     * @param MvcEvent $event
      */
     public function onBootstrap(MvcEvent $event)
     {
-        $eventManager        = $event->getApplication()->getEventManager();
+        $eventManager = $event->getApplication()->getEventManager();
+        $serviceManager = $event->getApplication()->getServiceManager();
+
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
 
-        $extractor = $event->getApplication()->getServiceManager()->get('CommonUtils\Extractor');
+        $extractor = $serviceManager->get('CommonUtils\Extractor');
         $extractor->setRequest($event->getRequest());
         $extractor->setResponse($event->getResponse());
 
-        $logger = $event->getApplication()->getServiceManager()->get('Logger');
+        $logger = $serviceManager->get('Logger');
         $logger->setExtractor($extractor);
+
+        /** @var PsrLoggerAdapter $psrLogger */
+        $psrLogger = $serviceManager->get('PsrLogger');
+        $config = $serviceManager->get('Config');
+        ErrorHandling::enable($psrLogger, isset($config['CommonUtils\Logger']) ? $config['CommonUtils\Logger'] : []);
 
         //catches exceptions for errors during dispatch
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
-        $sm = $event->getApplication()->getServiceManager();
         $sharedManager->attach(
             'Zend\Mvc\Application',
             'dispatch.error',
-            function ($event) use ($sm) {
+            function ($event) use ($serviceManager) {
                 if ($event->getParam('exception')) {
                     $exception = $event->getParam('exception');
-                    $sm->get('Logger')->crit(
+                    $serviceManager->get('Logger')->crit(
                         'Exception: [' . $exception->getMessage() . ']',
                         array(
                             'category' => 'Dispatch',
@@ -54,21 +58,6 @@ class Module
             }
         );
 
-        //catches exceptions in application code that are uncaught. For example if a database server goes down.
-        set_exception_handler(function($exception) use ($sm, $extractor, $event) {
-                //ensure that the application log, logs a 500 error
-                $event->getResponse()->setStatusCode(500);
-                $extractor->setResponse($event->getResponse());
-                http_response_code(500);
-                $sm->get('Logger')->crit(
-                    'Exception: [' . $exception->getMessage() . ']',
-                    array(
-                        'category' => 'API',
-                        'stackTrace' => $exception->getTraceAsString(),
-                    )
-                );
-        });
-
         //global catchall to log when a 400 or 500 error message is set on a response.
         //This is mainly for logging purposes.
         $eventManager->attach(
@@ -78,30 +67,17 @@ class Module
                     return;
                 }
                 $statusCode = $e->getResponse()->getStatusCode();
-                $sm = $e->getApplication()->getServiceManager();
                 if ($statusCode >= 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->crit(
-                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
-                        array(
-                            'category' => 'Event',
-                        )
-                    );
-                }
-                if ($statusCode >= 400 && $statusCode < 500) {
+                    $logger->crit('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
+                } elseif ($statusCode >= 400 && $statusCode < 500) {
                     $e->getResponse()->setStatusCode($statusCode);
                     $extractor->setResponse($e->getResponse());
-                    $sm->get('Logger')->warn(
-                        'Response: ' . $statusCode . '[' . $e->getResponse() . ']',
-                        array(
-                            'category' => 'Event',
-                        )
-                    );
+                    $logger->warn('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
                 }
             }
         );
-
     }
 
     /**
@@ -110,20 +86,6 @@ class Module
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
-    }
-
-    /**
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
     }
 
     /**
@@ -143,7 +105,7 @@ class Module
                             $writerAdapter = new $writer['adapter']($writer['adapterOptions']['output']);
                             $logger->addWriter($writerAdapter);
 
-                            if(!empty($writer['formatter'])) {
+                            if (!empty($writer['formatter'])) {
                                 $writerFormatter = new $writer['formatter']($writer['formatterOptions']);
                                 $writerAdapter->setFormatter($writerFormatter);
                             }
@@ -155,7 +117,6 @@ class Module
                         }
                     }
 
-                    ZendLogger::registerErrorHandler($logger);
                     return $logger;
                 },
                 'CommonUtils\SiriusFrontEndLogger' => function ($sm) {
@@ -171,6 +132,4 @@ class Module
             )
         );
     }
-
-
 }
