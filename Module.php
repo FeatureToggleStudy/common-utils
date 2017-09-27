@@ -10,6 +10,7 @@ use CommonUtils\Sirius\Logging\PsrLoggerAdapter;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Class Module.
@@ -34,10 +35,7 @@ class Module
         $logger = $serviceManager->get('Logger');
         $logger->setExtractor($extractor);
 
-        /** @var PsrLoggerAdapter $psrLogger */
-        $psrLogger = $serviceManager->get('PsrLogger');
-        $config = $serviceManager->get('Config');
-        ErrorHandling::enable($psrLogger, isset($config['CommonUtils\Logger']) ? $config['CommonUtils\Logger'] : []);
+        $this->enableSymfonyErrorHandler($serviceManager);
 
         //catches exceptions for errors during dispatch
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
@@ -131,5 +129,22 @@ class Module
                 'PsrLogger' => PsrLoggerAdapterFactory::class,
             )
         );
+    }
+
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    private function enableSymfonyErrorHandler(ServiceLocatorInterface $serviceLocator)
+    {
+        $config = $serviceLocator->get('Config');
+        $commonUtilsConfig = isset($config['CommonUtils\Logger']) ? $config['CommonUtils\Logger'] : [];
+
+        if (!isset($commonUtilsConfig['symfonyErrorHandler']) && true !== $commonUtilsConfig['symfonyErrorHandler']) {
+            return;
+        }
+
+        /** @var PsrLoggerAdapter $psrLogger */
+        $psrLogger = $serviceLocator->get('PsrLogger');
+        ErrorHandling::enable($psrLogger, $commonUtilsConfig);
     }
 }
