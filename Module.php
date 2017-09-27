@@ -139,7 +139,7 @@ class Module
         $config = $serviceLocator->get('Config');
         $commonUtilsConfig = isset($config['CommonUtils\Logger']) ? $config['CommonUtils\Logger'] : [];
 
-        if (!isset($commonUtilsConfig['symfonyErrorHandler']) && true !== $commonUtilsConfig['symfonyErrorHandler']) {
+        if (!isset($commonUtilsConfig['symfonyErrorHandler']) || true !== $commonUtilsConfig['symfonyErrorHandler']) {
             return;
         }
 
