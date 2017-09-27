@@ -10,9 +10,14 @@ use PHPUnit_Framework_TestCase;
  */
 class CustomJsonTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var CustomJson
+     */
+    private $customJson;
+
     public function setUp()
     {
-        $this->customjson = new CustomJson();
+        $this->customJson = new CustomJson();
     }
 
     public function testFormatReturnsJson()
@@ -22,7 +27,7 @@ class CustomJsonTest extends PHPUnit_Framework_TestCase
         $event['priorityName'] = 'DEBUG';
         $event['message'] = 'Some logging test';
         $event['extra'] = array('status_code' => 200, 'request_method' => 'POST');
-        $result = $this->customjson->format($event);
+        $result = $this->customJson->format($event);
 
         $jsonResult = sprintf('{"timestamp":%s,"@fields":{"priority":7,"priorityName":"DEBUG","message":"Some logging test","status_code":200,"request_method":"POST"}}',
             $event['timestamp']->getTimestamp());

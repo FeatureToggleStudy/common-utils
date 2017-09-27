@@ -20,6 +20,7 @@ class ErrorHandlingTest extends PHPUnit_Framework_TestCase
         $config = [
             'displayExceptions' => true,
             'logLocalVariables' => true,
+            'errorsToExceptions' => true,
         ];
 
         ErrorHandling::enable($logger, $config);
@@ -36,6 +37,7 @@ class ErrorHandlingTest extends PHPUnit_Framework_TestCase
         $config = [
             'displayExceptions' => true,
             'logLocalVariables' => true,
+            'errorsToExceptions' => true,
         ];
 
         ErrorHandling::enable(new TestLogger(), $config);
@@ -54,6 +56,7 @@ class ErrorHandlingTest extends PHPUnit_Framework_TestCase
         $config = [
             'displayExceptions' => false,
             'logLocalVariables' => false,
+            'errorsToExceptions' => true,
         ];
 
         ErrorHandling::enable(new TestLogger(), $config);
@@ -73,6 +76,7 @@ class ErrorHandlingTest extends PHPUnit_Framework_TestCase
         $config = [
             'displayExceptions' => false,
             'logLocalVariables' => false,
+            'errorsToExceptions' => true,
         ];
 
         ErrorHandling::enable($logger, $config);

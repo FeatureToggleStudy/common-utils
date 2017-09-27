@@ -1,6 +1,8 @@
 <?php
 return array(
     'CommonUtils\Logger' => array(
+        // Convert PHP errors to exceptions.
+        'errorsToExceptions' => false,
         // Whether to output exceptions in the response using formatted HTML. Exceptions are always logged.
         'displayExceptions' => false,
         // Logs local variables. Should be disabled for environments containing real user data (Pre-Prod, Prod) as it
@@ -9,6 +11,8 @@ return array(
         // will add the $logger object before the current PHP error handler
         'registerErrorHandler' => false, // errors logged to your writers
         'registerExceptionHandler' => false, // exceptions logged to your writers
+        // Enable the Symfony error handler provided by CommonUtils
+        'symfonyErrorHandler' => false,
 
         // multiple zend writer output & zend priority filters
         'writers' => array(
