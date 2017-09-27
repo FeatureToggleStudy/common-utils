@@ -5,12 +5,14 @@ namespace CommonUtils;
 use CommonUtils\Sirius\Factory\OpgHttpClientFactory;
 use CommonUtils\Sirius\Http\Client\SiriusHttpClient;
 use CommonUtils\Sirius\Logging\ErrorHandling;
+use CommonUtils\Sirius\Logging\Extractor;
 use CommonUtils\Sirius\Logging\Factory\PsrLoggerAdapterFactory;
 use CommonUtils\Sirius\Logging\PsrLoggerAdapter;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Log\Logger as ZendLogger;
 
 /**
  * Class Module.
@@ -28,6 +30,7 @@ class Module
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
 
+        /** @var Extractor $extractor */
         $extractor = $serviceManager->get('CommonUtils\Extractor');
         $extractor->setRequest($event->getRequest());
         $extractor->setResponse($event->getResponse());
@@ -55,6 +58,8 @@ class Module
                 }
             }
         );
+
+        $this->enableFallbackExceptionHandler($event, $serviceManager, $extractor);
 
         //global catchall to log when a 400 or 500 error message is set on a response.
         //This is mainly for logging purposes.
@@ -115,6 +120,11 @@ class Module
                         }
                     }
 
+                    if (!isset($config['CommonUtils\Logger']['symfonyErrorHandler'])
+                        || true !== $config['CommonUtils\Logger']['symfonyErrorHandler']) {
+                        ZendLogger::registerErrorHandler($logger);
+                    }
+
                     return $logger;
                 },
                 'CommonUtils\SiriusFrontEndLogger' => function ($sm) {
@@ -123,11 +133,12 @@ class Module
                 'CommonUtils\Extractor' => function ($sm) {
                     $config = $sm->get('Config')['CommonUtils\Logger']['extractions'];
                     $extractor = new Sirius\Logging\Extractor($config);
+
                     return $extractor;
                 },
                 SiriusHttpClient::class => OpgHttpClientFactory::class,
                 'PsrLogger' => PsrLoggerAdapterFactory::class,
-            )
+            ),
         );
     }
 
@@ -146,5 +157,41 @@ class Module
         /** @var PsrLoggerAdapter $psrLogger */
         $psrLogger = $serviceLocator->get('PsrLogger');
         ErrorHandling::enable($psrLogger, $commonUtilsConfig);
+    }
+
+    /**
+     * Catches exceptions in application code that are uncaught. For example if a database server goes down.
+     *
+     * @param MvcEvent $event
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param Extractor $extractor
+     */
+    private function enableFallbackExceptionHandler(
+        MvcEvent $event,
+        ServiceLocatorInterface $serviceLocator,
+        Extractor $extractor
+    ) {
+        $config = $serviceLocator->get('Config');
+
+        if (isset($config['CommonUtils\Logger']['symfonyErrorHandler'])
+            && true === $config['CommonUtils\Logger']['symfonyErrorHandler']) {
+            return;
+        }
+
+        set_exception_handler(
+            function ($exception) use ($event, $serviceLocator, $extractor) {
+                //ensure that the application log, logs a 500 error
+                $event->getResponse()->setStatusCode(500);
+                $extractor->setResponse($event->getResponse());
+                http_response_code(500);
+                $serviceLocator->get('Logger')->crit(
+                    'Exception: [' . $exception->getMessage() . ']',
+                    [
+                        'category' => 'API',
+                        'stackTrace' => $exception->getTraceAsString(),
+                    ]
+                );
+            }
+        );
     }
 }
