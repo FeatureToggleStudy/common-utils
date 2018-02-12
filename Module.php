@@ -8,6 +8,7 @@ use CommonUtils\Sirius\Logging\ErrorHandling;
 use CommonUtils\Sirius\Logging\Extractor;
 use CommonUtils\Sirius\Logging\Factory\PsrLoggerAdapterFactory;
 use CommonUtils\Sirius\Logging\PsrLoggerAdapter;
+use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Log\Filter\Priority;
@@ -181,7 +182,9 @@ class Module
         set_exception_handler(
             function ($exception) use ($event, $serviceLocator, $extractor) {
                 //ensure that the application log, logs a 500 error
-                $event->getResponse()->setStatusCode(500);
+                if ($event->getResponse() instanceof Response) {
+                    $event->getResponse()->setStatusCode(500);
+                }
                 $extractor->setResponse($event->getResponse());
                 http_response_code(500);
                 $serviceLocator->get('Logger')->crit(
