@@ -1,6 +1,7 @@
 {
     "name" : "ministryofjustice/common-utils",
     "description" : "Common code that is needed for all projects",
+    "license": "MIT",
     "keywords": [
         "ministryofjustice",
         "opg"
