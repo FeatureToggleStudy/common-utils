@@ -5,7 +5,9 @@ namespace CommonUtils\Sirius\Http\Client;
 use CommonUtils\Sirius\Logging\Logger;
 use Traversable;
 use Zend\Http\Client as ZendHttpClient;
+use Zend\Http\Header\GenericHeader;
 use Zend\Http\Request;
+use Blackfire\Client as BlackfireClient;
 
 class SiriusHttpClient extends ZendHttpClient
 {
@@ -54,6 +56,13 @@ class SiriusHttpClient extends ZendHttpClient
             ['category' => 'HTTP_CLIENT']
         );
 
+        // The actual HTTP-Header sent to the frontend is: "X-Blackfiretrigger" but nginx config converts it to the HTTP_X format before sending to php-fpm
+        if (isset($_SERVER['HTTP_X_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_BLACKFIRETRIGGER'] === 'true' && extension_loaded('blackfire')) {
+            $existingHeaders = $request->getHeaders();
+            $existingHeaders->addHeader(new GenericHeader('X-Blackfiretrigger', 'true'));
+        }
+
+        // Make the HTTP sub-request
         $response = parent::send($request);
 
         $contentType = 'Content-Type: application/octet-stream';
