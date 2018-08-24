@@ -13,6 +13,7 @@ class SiriusHttpClient extends ZendHttpClient
 {
     const REQUEST_LOG_MESSAGE = 'Making HTTP request: %s %s';
     const RESPONSE_LOG_MESSAGE = '%s Response received: %s %s (%d bytes)';
+
     /** @var Logger $logger */
     private $logger;
 
@@ -49,6 +50,13 @@ class SiriusHttpClient extends ZendHttpClient
 
     public function send(Request $request = null)
     {
+
+        // This is to work around the fact that Zend populates an internal $request object, and you can also send through $request here.
+        // We always want $request to be a real object, so this takes care of that.
+        if($request === null) {
+            $request = $this->getRequest();
+        }
+
         $preRequest = microtime(true);
 
         $this->logger->info(
@@ -56,10 +64,11 @@ class SiriusHttpClient extends ZendHttpClient
             ['category' => 'HTTP_CLIENT']
         );
 
-        // The actual HTTP-Header sent to the frontend is: "X-Blackfiretrigger" but nginx config converts it to the HTTP_X format before sending to php-fpm
-        if (isset($_SERVER['HTTP_X_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_BLACKFIRETRIGGER'] === 'true' && extension_loaded('blackfire')) {
+        // The actual HTTP-Header sent to the frontend is: "X-Sirius-Blackfiretrigger" but nginx config converts it to the HTTP_X format before sending to php-fpm
+        if (isset($_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER'] === 'true' && extension_loaded('blackfire')) {
             $existingHeaders = $request->getHeaders();
-            $existingHeaders->addHeader(new GenericHeader('X-Blackfiretrigger', 'true'));
+            $existingHeaders->addHeader(new GenericHeader('X-Sirius-Blackfiretrigger', 'true'));
+            $request->setHeaders($existingHeaders);
         }
 
         // Make the HTTP sub-request
