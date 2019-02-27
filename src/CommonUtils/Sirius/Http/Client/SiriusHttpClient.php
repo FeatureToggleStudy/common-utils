@@ -65,7 +65,7 @@ class SiriusHttpClient extends ZendHttpClient
         );
 
         // The actual HTTP-Header sent to the frontend is: "X-Sirius-Blackfiretrigger" but nginx config converts it to the HTTP_X format before sending to php-fpm
-        if (isset($_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER'] === 'true' && extension_loaded('blackfire')) {
+        if (isset($_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER'] === 'true') {
             $existingHeaders = $request->getHeaders();
             $existingHeaders->addHeader(new GenericHeader('X-Sirius-Blackfiretrigger', 'true'));
             $request->setHeaders($existingHeaders);
