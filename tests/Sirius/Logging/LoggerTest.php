@@ -14,7 +14,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $sampleLoggerConfigFile = include(__DIR__.'/../../../../config/sample.logger.global.php');
+        $sampleLoggerConfigFile = include(__DIR__.'/../../../config/sample.logger.global.php');
         $sampleConfig = $sampleLoggerConfigFile['CommonUtils\Logger'];
         $this->logger = new Logger();
         foreach ($sampleConfig['writers'] as $writer) {

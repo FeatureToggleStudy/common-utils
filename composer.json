@@ -8,12 +8,17 @@
     ],
     "homepage": "https://github.com/ministryofjustice/common-utils",
     "type": "library",
+    "license": [
+        "proprietary"
+    ],
     "config": {
         "sort-packages": true
     },
     "require": {
-        "php": ">=5.5",
+        "php": ">=7.1",
+        "container-interop/container-interop": "^1.2",
         "psr/log": "^1.0",
+        "qandidate/toggle": "^1.1",
         "symfony/debug": ">=2.6.0, <4.0",
         "zendframework/zendframework": "2.*"
     },
@@ -23,11 +28,17 @@
     },
     "autoload" : {
         "psr-4" : {
-            "CommonUtils\\" : "src/CommonUtils/",
-            "CommonUtilsTest\\": "tests/CommonUtilsTest/"
+            "CommonUtils\\" : "src/",
+            "CommonUtilsTest\\": "tests/"
         },
         "classmap": [
             "Module.php"
         ]
+    },
+    "scripts": {
+        "test": [
+            "@test-unit"
+        ],
+        "test-unit": "@php vendor/bin/phpunit --debug --configuration=tests/phpunit.xml"
     }
 }
