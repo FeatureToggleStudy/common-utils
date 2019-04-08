@@ -4,6 +4,7 @@ namespace CommonUtils\Sirius\Factory;
 
 use CommonUtils\Sirius\Http\Client\SiriusHttpClient;
 use CommonUtils\Sirius\Logging\Logger;
+use Zend\Http\Headers;
 use Zend\Http\Request as ZendHttpRequest;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -29,11 +30,7 @@ class OpgHttpClientFactory implements FactoryInterface
         $request = $this->generateRequest($serviceLocator);
 
         // Set up client with new adapter and request to backend
-        $client = new SiriusHttpClient(
-            $uri,
-            $options,
-            $logger
-        );
+        $client = new SiriusHttpClient($logger, $uri, $options);
 
         if (!empty($request)) {
             $client->setRequest($request);
@@ -78,6 +75,7 @@ class OpgHttpClientFactory implements FactoryInterface
 
             $restRequest = new ZendHttpRequest();
             $restRequest->setUri($config['sirius_http_client']['uri']);
+            /** @var Headers $restHeaders */
             $restHeaders = $restRequest->getHeaders();
 
             if ($httpHeaders->get('X-REQUEST-ID')) {

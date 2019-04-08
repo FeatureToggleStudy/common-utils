@@ -6,40 +6,44 @@ use CommonUtils\Sirius\Logging\Logger;
 use Traversable;
 use Zend\Http\Client as ZendHttpClient;
 use Zend\Http\Header\GenericHeader;
+use Zend\Http\Headers;
 use Zend\Http\Request;
-use Blackfire\Client as BlackfireClient;
 
 class SiriusHttpClient extends ZendHttpClient
 {
     const REQUEST_LOG_MESSAGE = 'Making HTTP request: %s %s';
     const RESPONSE_LOG_MESSAGE = '%s Response received: %s %s (%d bytes)';
 
-    /** @var Logger $logger */
+    /**
+     * @var Logger $logger
+     */
     private $logger;
 
     /**
      * Constructor
      *
-     * @param string $uri
-     * @param array|Traversable $options
-     * @param null $logger
+     * @param Logger $logger
+     * @param string|null $uri
+     * @param array|null $options
      */
-    public function __construct($uri = null, $options = null, $logger = null)
+    public function __construct(Logger $logger, string $uri = null, array $options = null)
     {
         parent::__construct($uri, $options);
+
         $this->logger = $logger;
     }
 
     /**
      * @return Logger
      */
-    public function getLogger()
+    public function getLogger(): Logger
     {
         return $this->logger;
     }
 
     /**
      * @param Logger $logger
+     *
      * @return $this
      */
     public function setLogger(Logger $logger)
@@ -66,6 +70,7 @@ class SiriusHttpClient extends ZendHttpClient
 
         // The actual HTTP-Header sent to the frontend is: "X-Sirius-Blackfiretrigger" but nginx config converts it to the HTTP_X format before sending to php-fpm
         if (isset($_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER']) && $_SERVER['HTTP_X_SIRIUS_BLACKFIRETRIGGER'] === 'true') {
+            /** @var Headers $existingHeaders */
             $existingHeaders = $request->getHeaders();
             $existingHeaders->addHeader(new GenericHeader('X-Sirius-Blackfiretrigger', 'true'));
             $request->setHeaders($existingHeaders);
@@ -79,7 +84,7 @@ class SiriusHttpClient extends ZendHttpClient
             $contentType = $response->getHeaders()->get('Content-Type')->toString();
         }
 
-        if ((int) $response->getStatusCode() >= 500) {
+        if ($response->getStatusCode() >= 500) {
             $this->logger->warn(
                 sprintf(
                     self::RESPONSE_LOG_MESSAGE,

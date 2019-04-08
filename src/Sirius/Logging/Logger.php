@@ -6,6 +6,8 @@ use Zend\Log\Logger as ZendLogger;
 
 class Logger extends ZendLogger
 {
+    private $extractor;
+
     /**
      * @param int $priority
      * @param mixed $message
