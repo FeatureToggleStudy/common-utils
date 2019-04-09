@@ -4,6 +4,9 @@ namespace CommonUtils\Sirius\Logging;
 
 class Extractor
 {
+    private $config;
+    private $request;
+    private $response;
 
     public function __construct($config)
     {
@@ -56,8 +59,9 @@ class Extractor
     }
 
     /**
-     * @param $classProperty
-     * @param $methodsCallsOnClassProperty
+     * @param $objectExtractions
+     *
+     * @return array
      */
     private function extractValuesFromObject($objectExtractions) {
 

@@ -7,7 +7,7 @@
         syntaxCheck="false"
         verbose="true">
     <testsuite name="common-utils">
-        <directory>CommonUtilsTest/</directory>
+        <directory>./</directory>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">

@@ -12,22 +12,33 @@
         "sort-packages": true
     },
     "require": {
-        "php": ">=5.5",
+        "php": ">=7.1",
+        "container-interop/container-interop": "^1.2",
         "psr/log": "^1.0",
+        "qandidate/toggle": "^1.1",
         "symfony/debug": ">=2.6.0, <4.0",
         "zendframework/zendframework": "2.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
-        "mockery/mockery": "0.8.0"
+        "mockery/mockery": "0.8.0",
+        "phpstan/phpstan": " ^0.8",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload" : {
         "psr-4" : {
-            "CommonUtils\\" : "src/CommonUtils/",
-            "CommonUtilsTest\\": "tests/CommonUtilsTest/"
+            "CommonUtils\\" : "src/",
+            "CommonUtilsTest\\": "tests/"
         },
         "classmap": [
             "Module.php"
         ]
+    },
+    "scripts": {
+        "test": [
+            "@test-unit",
+            "@test-phpstan"
+        ],
+        "test-unit": "@php vendor/bin/phpunit --debug --configuration=tests/phpunit.xml",
+        "test-phpstan": "@php vendor/bin/phpstan analyze src --level=7"
     }
 }

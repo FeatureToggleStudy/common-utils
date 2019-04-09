@@ -1,17 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace CommonUtils\Sirius\Logging;
 
 use Psr\Log\AbstractLogger as PsrAbstractLogger;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
-use Zend\Log\LoggerInterface;
+use Zend\Log\Logger as ZendLogger;
 
 /**
- * PSR-3 logger adapter for Zend\Log\LoggerInterface
+ * PSR-3 logger adapter for Zend\Log\Logger
  *
- * Decorates a LoggerInterface to allow it to be used anywhere a PSR-3 logger
- * is expected.
+ * Decorates a Zend\Log\Logger to allow it to be used anywhere a PSR-3 logger is expected.
  *
  * Adapted from https://github.com/zendframework/zend-log/blob/release-2.9.2/test/PsrLoggerAdapterTest.php
  * Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
@@ -19,9 +19,7 @@ use Zend\Log\LoggerInterface;
 class PsrLoggerAdapter extends PsrAbstractLogger
 {
     /**
-     * Zend\Log logger
-     *
-     * @var LoggerInterface
+     * @var ZendLogger
      */
     protected $logger;
 
@@ -31,32 +29,32 @@ class PsrLoggerAdapter extends PsrAbstractLogger
      * @var array
      */
     protected $psrPriorityMap = [
-        LogLevel::EMERGENCY => Logger::EMERG,
-        LogLevel::ALERT     => Logger::ALERT,
-        LogLevel::CRITICAL  => Logger::CRIT,
-        LogLevel::ERROR     => Logger::ERR,
-        LogLevel::WARNING   => Logger::WARN,
-        LogLevel::NOTICE    => Logger::NOTICE,
-        LogLevel::INFO      => Logger::INFO,
-        LogLevel::DEBUG     => Logger::DEBUG,
+        LogLevel::EMERGENCY => ZendLogger::EMERG,
+        LogLevel::ALERT     => ZendLogger::ALERT,
+        LogLevel::CRITICAL  => ZendLogger::CRIT,
+        LogLevel::ERROR     => ZendLogger::ERR,
+        LogLevel::WARNING   => ZendLogger::WARN,
+        LogLevel::NOTICE    => ZendLogger::NOTICE,
+        LogLevel::INFO      => ZendLogger::INFO,
+        LogLevel::DEBUG     => ZendLogger::DEBUG,
     ];
 
     /**
      * Constructor
      *
-     * @param LoggerInterface $logger
+     * @param ZendLogger $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(ZendLogger $logger)
     {
         $this->logger = $logger;
     }
 
     /**
-     * Returns composed LoggerInterface instance.
+     * Returns composed ZendLogger instance.
      *
-     * @return LoggerInterface
+     * @return ZendLogger
      */
-    public function getLogger()
+    public function getLogger(): ZendLogger
     {
         return $this->logger;
     }
@@ -72,10 +70,10 @@ class PsrLoggerAdapter extends PsrAbstractLogger
      */
     public function log($level, $message, array $context = [])
     {
-        if (! array_key_exists($level, $this->psrPriorityMap)) {
+        if (!isset($this->psrPriorityMap[$level])) {
             throw new InvalidArgumentException(sprintf(
                 '$level must be one of PSR-3 log levels; received %s',
-                var_export($level, 1)
+                var_export($level, true)
             ));
         }
 
