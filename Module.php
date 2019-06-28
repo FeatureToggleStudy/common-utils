@@ -27,6 +27,8 @@ class Module
     {
         $eventManager = $event->getApplication()->getEventManager();
         $serviceManager = $event->getApplication()->getServiceManager();
+        $config = $serviceManager->get('Config')['CommonUtils\Logger'];
+        $dispatchErrorPriority = empty($config['dispatchErrorPriority']) ? 1 : $config['dispatchErrorPriority'];
 
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
@@ -45,19 +47,20 @@ class Module
         $sharedManager = $event->getApplication()->getEventManager()->getSharedManager();
         $sharedManager->attach(
             'Zend\Mvc\Application',
-            'dispatch.error',
-            function ($event) use ($serviceManager) {
+            MvcEvent::EVENT_DISPATCH_ERROR,
+            function (MvcEvent $event) use ($serviceManager) {
                 if ($event->getParam('exception')) {
                     $exception = $event->getParam('exception');
                     $serviceManager->get('Logger')->crit(
                         'Exception: [' . $exception->getMessage() . ']',
-                        array(
+                        [
                             'category' => 'Dispatch',
                             'stackTrace' => $exception->getTraceAsString(),
-                        )
+                        ]
                     );
                 }
-            }
+            },
+            $dispatchErrorPriority
         );
 
         $this->enableFallbackExceptionHandler($event, $serviceManager, $extractor);
