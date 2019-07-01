@@ -51,6 +51,13 @@ class Module
             function (MvcEvent $event) use ($serviceManager) {
                 if ($event->getParam('exception')) {
                     $exception = $event->getParam('exception');
+
+                    // We don't need to log non-critical server errors
+                    if (method_exists($exception, 'getStatusCode')
+                        && $exception->getStatusCode() < Response::STATUS_CODE_500) {
+                        return;
+                    }
+
                     $serviceManager->get('Logger')->crit(
                         'Exception: [' . $exception->getMessage() . ']',
                         [
