@@ -13,6 +13,8 @@ return array(
         'registerExceptionHandler' => false, // exceptions logged to your writers
         // Enable the Symfony error handler provided by CommonUtils
         'symfonyErrorHandler' => false,
+        // Needs to be higher priority than any modules that stop error events propagating
+        'dispatchErrorPriority' => 1,
 
         // multiple zend writer output & zend priority filters
         'writers' => array(
