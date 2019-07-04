@@ -71,27 +71,6 @@ class Module
         );
 
         $this->enableFallbackExceptionHandler($event, $serviceManager, $extractor);
-
-        //global catchall to log when a 400 or 500 error message is set on a response.
-        //This is mainly for logging purposes.
-        $eventManager->attach(
-            MvcEvent::EVENT_FINISH,
-            function ($e) use ($logger, $extractor) {
-                if (!method_exists($e->getResponse(), 'getStatusCode')) {
-                    return;
-                }
-                $statusCode = $e->getResponse()->getStatusCode();
-                if ($statusCode >= 500) {
-                    $e->getResponse()->setStatusCode($statusCode);
-                    $extractor->setResponse($e->getResponse());
-                    $logger->crit('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
-                } elseif ($statusCode >= 400 && $statusCode < 500) {
-                    $e->getResponse()->setStatusCode($statusCode);
-                    $extractor->setResponse($e->getResponse());
-                    $logger->warn('Response: ' . $statusCode . '[' . $e->getResponse() . ']', ['category' => 'Event']);
-                }
-            }
-        );
     }
 
     /**
