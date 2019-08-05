@@ -6,8 +6,6 @@ use CommonUtils\Sirius\Logging\LogLevelService;
 use OutOfRangeException;
 use PHPUnit_Framework_TestCase;
 
-//use PHPUnit\Framework\TestCase;
-
 class LogLevelServiceTest extends PHPUnit_Framework_TestCase
 {
     const DUMMY_ENV_VAR_STACKNAME = 'OPG_STACKNAME';
