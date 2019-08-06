@@ -21,19 +21,6 @@ class LogLevelService
     const PROD_MAX_LOG_LEVEL = Logger::INFO;
 
     /**
-     * @var LogLevelService
-     */
-    private static $instance;
-
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    /**
      * @param int $logLevel
      * @throws OutOfRangeException
      */

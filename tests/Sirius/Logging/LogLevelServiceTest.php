@@ -14,7 +14,7 @@ class LogLevelServiceTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $stackName
      */
-    private function setStackEnvVar(string $stackName)
+    private function setStackEnvVar(string $stackName): void
     {
         putenv(self::DUMMY_ENV_VAR_STACKNAME . '=' . $stackName);
     }
@@ -22,7 +22,7 @@ class LogLevelServiceTest extends PHPUnit_Framework_TestCase
     /**
      * @param int $logLevel
      */
-    private function setLogEnvVar(int $logLevel)
+    private function setLogEnvVar(int $logLevel): void
     {
         putenv(self::DUMMY_ENV_VAR_LOGLEVEL . '=' . $logLevel);
     }
@@ -33,7 +33,7 @@ class LogLevelServiceTest extends PHPUnit_Framework_TestCase
         putenv(self::DUMMY_ENV_VAR_LOGLEVEL . '=');
     }
 
-    public function test_service_only_accepts_valid_zend_log_levels()
+    public function test_service_only_accepts_valid_zend_log_levels(): void
     {
         foreach (LogLevelService::ACCEPTABLE_LOG_LEVELS as $logLevel) {
             $this->setLogEnvVar($logLevel);
@@ -59,7 +59,7 @@ class LogLevelServiceTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function test_service_bumps_down_log_level_on_production_environments()
+    public function test_service_bumps_down_log_level_on_production_environments(): void
     {
         $productionEnvironments = [
             'preprod',
@@ -83,7 +83,7 @@ class LogLevelServiceTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function test_service_not_overwriting_log_level_on_non_production_environments()
+    public function test_service_not_overwriting_log_level_on_non_production_environments(): void
     {
         $developmentEnvironments = [
             'feature1',
