@@ -49,7 +49,7 @@ class LogLevelService
      */
     public static function getLogLevel(
         string $logLevelEnvVarName,
-        string $stackNameEnvVarName= self::DEFAULT_ENV_VAR_STACKNAME,
+        string $stackNameEnvVarName = self::DEFAULT_ENV_VAR_STACKNAME,
         int $fallbackLogLevel = self::PROD_MAX_LOG_LEVEL
     ): int
     {
