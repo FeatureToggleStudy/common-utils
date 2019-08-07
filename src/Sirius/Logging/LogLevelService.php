@@ -17,6 +17,7 @@ class LogLevelService
         Logger::INFO,
         Logger::DEBUG
     ];
+    const DEFAULT_ENV_VAR_STACKNAME = 'OPG_STACKNAME';
     const ERR_MSG_OUT_OF_RANGE = '"%s" is not a valid Zend log level';
     const PROD_MAX_LOG_LEVEL = Logger::INFO;
 
@@ -48,7 +49,7 @@ class LogLevelService
      */
     public static function getLogLevel(
         string $logLevelEnvVarName,
-        string $stackNameEnvVarName,
+        string $stackNameEnvVarName = self::DEFAULT_ENV_VAR_STACKNAME,
         int $fallbackLogLevel = self::PROD_MAX_LOG_LEVEL
     ): int
     {
