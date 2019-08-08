@@ -20,6 +20,7 @@
         "zendframework/zendframework": "2.*"
     },
     "require-dev": {
+        "doctrine/common": "^2.10",
         "mockery/mockery": "0.8.0",
         "phpstan/phpstan": " ^0.8",
         "phpunit/phpunit": "3.7.*"
