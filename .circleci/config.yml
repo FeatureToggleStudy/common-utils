@@ -17,4 +17,5 @@ jobs:
           key: composer-v1-{{ checksum "composer.lock" }}
           paths:
             - vendor
-      - run: ./vendor/bin/phpunit -c tests/phpunit.xml
+      - run: composer test-unit
+      - run: composer test-phpstan
