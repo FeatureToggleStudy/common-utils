@@ -65,6 +65,16 @@ class Module
                             'stackTrace' => $exception->getTraceAsString(),
                         ]
                     );
+                    
+                    while ($exception->getPrevious() !== null) {
+                        $serviceManager->get('Logger')->debug(
+                            'Previous Exception: [' . $exception->getMessage() . ']',
+                            [
+                                'category' => 'Dispatch',
+                                'stackTrace' => $exception->getTraceAsString(),
+                            ]
+                        );
+                    }
                 }
             },
             $dispatchErrorPriority
