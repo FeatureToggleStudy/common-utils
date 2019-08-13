@@ -67,6 +67,7 @@ class Module
                     );
                     
                     while ($exception->getPrevious() !== null) {
+                        $exception = $exception->getPrevious();
                         $serviceManager->get('Logger')->debug(
                             'Previous Exception: [' . $exception->getMessage() . ']',
                             [
